@@ -9,7 +9,7 @@ interface ProfileSettingsModalProps {
 }
 
 const LanguageRec: React.FC = () => (
-    <div className="mt-6 p-4 bg-black/30 rounded-lg text-xs text-zinc-400 border border-zinc-700/50">
+    <div className="mt-6 p-4 bg-black/30 rounded-2xl text-xs text-zinc-400 border border-zinc-700/50">
         <h4 className="font-bold text-zinc-300 mb-2 uppercase tracking-widest">P2P Backend Tech</h4>
         <p>For a real-world decentralized application, high-performance languages are ideal for the peer-to-peer layer.</p>
         <ul className="list-disc list-inside mt-2 space-y-1">
@@ -94,17 +94,17 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                             id="profile-name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-zinc-800 rounded-md py-2 px-4 text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-lime-500 border border-zinc-700"
+                            className="w-full bg-zinc-800 rounded-xl py-3 px-4 text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-lime-500 border border-zinc-700"
                             required
                         />
                     </div>
                      <div className="flex justify-end space-x-3">
-                        <button type="button" onClick={onClose} className="px-4 py-2 rounded-md text-zinc-300 hover:bg-zinc-700 transition-colors">
+                        <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-zinc-300 hover:bg-zinc-700 transition-colors">
                             Cancel
                         </button>
                         <button 
                             type="submit"
-                            className="px-6 py-2 bg-lime-500 text-black font-bold rounded-md hover:bg-lime-400 transition-colors disabled:opacity-50"
+                            className="px-6 py-2 bg-lime-500 text-black font-bold rounded-xl hover:bg-lime-400 transition-colors disabled:opacity-50"
                             disabled={!name.trim()}
                         >
                             Save Changes

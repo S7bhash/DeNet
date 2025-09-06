@@ -11,7 +11,7 @@ const MediaGridItem: React.FC<{ message: Message; onSelect: () => void }> = ({ m
 
     return (
         <div
-            className="relative aspect-square bg-zinc-800 rounded-lg overflow-hidden cursor-pointer group"
+            className="relative aspect-square bg-zinc-800 rounded-2xl overflow-hidden cursor-pointer group"
             onClick={onSelect}
         >
             <img src={message.content} alt={message.fileName || 'media'} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />

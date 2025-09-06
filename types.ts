@@ -11,6 +11,9 @@ export enum MessageType {
   VIDEO = 'VIDEO',
   FILE = 'FILE',
   SYSTEM = 'SYSTEM',
+  POLL = 'POLL',
+  EVENT = 'EVENT',
+  LOCATION = 'LOCATION',
 }
 
 export interface Message {
@@ -21,6 +24,22 @@ export interface Message {
   timestamp: string;
   fileName?: string;
   fileSize?: string;
+  reactions: { [emoji: string]: string[] }; // emoji -> userIds
+  readBy: string[]; // userIds
+  poll?: {
+    question: string;
+    options: { text: string; votes: string[] }[];
+  };
+  event?: {
+    title: string;
+    dateTime: string;
+    location: string;
+  };
+  location?: {
+    latitude: number;
+    longitude: number;
+    label: string;
+  };
 }
 
 export interface Group {

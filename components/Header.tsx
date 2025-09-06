@@ -17,10 +17,10 @@ const LockIcon: React.FC = () => (
 const ViewToggleButton: React.FC<{ label: string; isActive: boolean; onClick: () => void }> = ({ label, isActive, onClick }) => (
     <button
         onClick={onClick}
-        className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+        className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${
             isActive
-                ? 'bg-lime-400/10 text-lime-300'
-                : 'text-zinc-400 hover:bg-zinc-700/50'
+                ? 'bg-zinc-700 text-lime-300'
+                : 'text-zinc-400 hover:text-white'
         }`}
     >
         {label}
@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ groupName, memberCount, activeView, onV
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 bg-zinc-800 p-1 rounded-lg">
+      <div className="flex items-center space-x-1 bg-zinc-800/80 p-1 rounded-full">
           <ViewToggleButton label="Chat" isActive={activeView === 'chat'} onClick={() => onViewChange('chat')} />
           <ViewToggleButton label="Media" isActive={activeView === 'media'} onClick={() => onViewChange('media')} />
       </div>

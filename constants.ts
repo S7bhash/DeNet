@@ -1,4 +1,27 @@
-import { User, Group, MessageType, Contact, Invitation } from './types';
+import { User, Group, MessageType, Contact, Invitation, Message } from './types';
+
+function getISOTimestamp(timeString: string): string {
+  const now = new Date();
+  const [time, period] = timeString.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (period && period.toLowerCase() === 'pm' && hours < 12) {
+    hours += 12;
+  }
+  if (period && period.toLowerCase() === 'am' && hours === 12) {
+    hours = 0;
+  }
+  
+  now.setHours(hours, minutes, 0, 0);
+  return now.toISOString();
+}
+
+function getYesterdayISO(): string {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday.toISOString();
+}
+
 
 export const currentUser: User = {
   id: 'user-1',
@@ -36,11 +59,28 @@ export const MOCK_GROUPS: Group[] = [
     members: [users['user-1'], users['user-2'], users['user-3']],
     unreadCount: 3,
     messages: [
-      { id: 'msg-1-1', authorId: 'user-2', type: MessageType.TEXT, content: 'Hey everyone, check out the latest design mockups.', timestamp: '10:30 AM' },
-      { id: 'msg-1-2', authorId: 'user-2', type: MessageType.IMAGE, content: 'https://picsum.photos/seed/mockup/400/300', fileName: 'dashboard-v3.png', fileSize: '1.2 MB', timestamp: '10:31 AM' },
-      { id: 'msg-1-3', authorId: 'user-3', type: MessageType.TEXT, content: 'Looks great! I especially like the new color palette.', timestamp: '10:35 AM' },
-      { id: 'msg-1-4', authorId: 'user-1', type: MessageType.TEXT, content: 'Agreed. I will start implementing the sidebar component.', timestamp: '10:38 AM' },
-      { id: 'msg-1-5', authorId: 'user-3', type: MessageType.FILE, content: '', fileName: 'project-specs.pdf', fileSize: '856 KB', timestamp: '11:05 AM' },
+      { id: 'msg-1-1', authorId: 'user-2', type: MessageType.TEXT, content: 'Hey everyone, check out the latest design mockups.', timestamp: getISOTimestamp('10:30 AM'), reactions: { '👍': ['user-3'] }, readBy: ['user-1', 'user-2', 'user-3'] },
+      { id: 'msg-1-2', authorId: 'user-2', type: MessageType.IMAGE, content: 'https://picsum.photos/seed/mockup/400/300', fileName: 'dashboard-v3.png', fileSize: '1.2 MB', timestamp: getISOTimestamp('10:31 AM'), reactions: { '😮': ['user-1'] }, readBy: ['user-1', 'user-2', 'user-3'] },
+      { id: 'msg-1-3', authorId: 'user-3', type: MessageType.TEXT, content: 'Looks great! I especially like the new color palette.', timestamp: getISOTimestamp('10:35 AM'), reactions: {}, readBy: ['user-1', 'user-2', 'user-3'] },
+      { id: 'msg-1-4', authorId: 'user-1', type: MessageType.TEXT, content: 'Agreed. I will start implementing the sidebar component.', timestamp: getISOTimestamp('10:38 AM'), reactions: {}, readBy: ['user-1', 'user-3'] },
+      { id: 'msg-1-5', authorId: 'user-3', type: MessageType.FILE, content: '', fileName: 'project-specs.pdf', fileSize: '856 KB', timestamp: getISOTimestamp('11:05 AM'), reactions: {}, readBy: ['user-3'] },
+      { 
+        id: 'msg-1-6', 
+        authorId: 'user-3', 
+        type: MessageType.POLL, 
+        content: 'Poll: Where should we go for the team lunch?', 
+        timestamp: getISOTimestamp('11:15 AM'), 
+        reactions: {}, 
+        readBy: ['user-3', 'user-2', 'user-1'],
+        poll: {
+            question: 'Where should we go for the team lunch?',
+            options: [
+                { text: 'Italian Place', votes: ['user-3'] },
+                { text: 'Sushi Bar', votes: ['user-2'] },
+                { text: 'Taco Truck', votes: [] }
+            ]
+        }
+      }
     ],
   },
   {
@@ -49,9 +89,9 @@ export const MOCK_GROUPS: Group[] = [
     members: [users['user-1'], users['user-2'], users['user-4']],
     unreadCount: 0,
     messages: [
-       { id: 'msg-2-1', authorId: 'user-4', type: MessageType.TEXT, content: 'What\'s the status on the video ad campaign?', timestamp: 'Yesterday' },
-       { id: 'msg-2-2', authorId: 'user-2', type: MessageType.VIDEO, content: 'https://picsum.photos/seed/video/400/225', fileName: 'campaign-draft-v2.mp4', fileSize: '15.7 MB', timestamp: 'Yesterday' },
-       { id: 'msg-2-3', authorId: 'user-1', type: MessageType.TEXT, content: 'Just reviewed it, adding my feedback now. Great work!', timestamp: '9:15 AM' },
+       { id: 'msg-2-1', authorId: 'user-4', type: MessageType.TEXT, content: 'What\'s the status on the video ad campaign?', timestamp: getYesterdayISO(), reactions: {}, readBy: ['user-1', 'user-2', 'user-4'] },
+       { id: 'msg-2-2', authorId: 'user-2', type: MessageType.VIDEO, content: 'https://picsum.photos/seed/video/400/225', fileName: 'campaign-draft-v2.mp4', fileSize: '15.7 MB', timestamp: getYesterdayISO(), reactions: { '❤️': ['user-4'] }, readBy: ['user-1', 'user-2', 'user-4'] },
+       { id: 'msg-2-3', authorId: 'user-1', type: MessageType.TEXT, content: 'Just reviewed it, adding my feedback now. Great work!', timestamp: getISOTimestamp('9:15 AM'), reactions: {}, readBy: ['user-1'] },
     ],
   },
   {
@@ -60,7 +100,7 @@ export const MOCK_GROUPS: Group[] = [
     members: [users['user-1'], users['user-3']],
     unreadCount: 1,
     messages: [
-      { id: 'msg-3-1', authorId: 'user-3', type: MessageType.TEXT, content: 'Anyone up for a hike this weekend?', timestamp: '1:20 PM' },
+      { id: 'msg-3-1', authorId: 'user-3', type: MessageType.TEXT, content: 'Anyone up for a hike this weekend?', timestamp: getISOTimestamp('1:20 PM'), reactions: {}, readBy: ['user-3'] },
     ],
   },
 ];
@@ -83,8 +123,8 @@ export const MOCK_INVITATIONS: Invitation[] = [
             members: [users['user-3']],
             unreadCount: 1,
             messages: [
-                { id: 'msg-4-1', authorId: 'user-3', type: MessageType.TEXT, content: 'Ready for the mission?', timestamp: '3:45 PM' },
+                { id: 'msg-4-1', authorId: 'user-3', type: MessageType.TEXT, content: 'Ready for the mission?', timestamp: getISOTimestamp('3:45 PM'), reactions: {}, readBy: ['user-3'] },
             ],
         }
     }
-]
+];

@@ -71,16 +71,16 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
                             placeholder="e.g., Project Cerberus"
-                            className="w-full bg-zinc-800 rounded-md py-2 px-4 text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-lime-500 border border-zinc-700"
+                            className="w-full bg-zinc-800 rounded-xl py-3 px-4 text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-lime-500 border border-zinc-700"
                             required
                         />
                     </div>
 
                     <div className="mb-6">
                         <label className="block text-sm font-semibold text-zinc-400 mb-2">Invite from Contacts</label>
-                        <div className="max-h-48 overflow-y-auto space-y-2 p-2 bg-zinc-800/50 rounded-md border border-zinc-700/50">
+                        <div className="max-h-48 overflow-y-auto space-y-2 p-2 bg-zinc-800/50 rounded-2xl border border-zinc-700/50">
                             {MOCK_CONTACTS.map(contact => (
-                                <div key={contact.id} className="flex items-center justify-between p-2 rounded hover:bg-zinc-700/50">
+                                <label key={contact.id} className="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-700/50 cursor-pointer">
                                     <div className="flex items-center space-x-3">
                                         <img src={contact.avatarUrl} alt={contact.name} className="w-8 h-8 rounded-full" />
                                         <div className="flex flex-col">
@@ -94,18 +94,18 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
                                         onChange={() => handleContactToggle(contact)}
                                         className="form-checkbox h-5 w-5 bg-zinc-700 border-zinc-600 rounded text-lime-500 focus:ring-lime-500/50"
                                     />
-                                </div>
+                                </label>
                             ))}
                         </div>
                     </div>
 
                     <div className="flex justify-end space-x-3">
-                        <button type="button" onClick={onClose} className="px-4 py-2 rounded-md text-zinc-300 hover:bg-zinc-700 transition-colors">
+                        <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-zinc-300 hover:bg-zinc-700 transition-colors">
                             Cancel
                         </button>
                         <button 
                             type="submit"
-                            className="px-6 py-2 bg-lime-500 text-black font-bold rounded-md hover:bg-lime-400 transition-colors disabled:opacity-50 disabled:bg-zinc-600"
+                            className="px-6 py-2 bg-lime-500 text-black font-bold rounded-xl hover:bg-lime-400 transition-colors disabled:opacity-50 disabled:bg-zinc-600"
                             disabled={!groupName.trim() || selectedContacts.length === 0}
                         >
                             Create & Invite
