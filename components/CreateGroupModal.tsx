@@ -63,7 +63,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
                 <div className="w-10 h-1.5 bg-zinc-700 rounded-full mx-auto mb-4"></div>
                 <h2 className="text-2xl font-bold text-white mb-4 text-center">Create New Network</h2>
                 
-                <form onSubmit={handleSubmit} className="p-2">
+                <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label htmlFor="group-name" className="block text-sm font-semibold text-zinc-400 mb-2">Network Name</label>
                         <input
@@ -79,7 +79,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
 
                     <div className="mb-6">
                         <label className="block text-sm font-semibold text-zinc-400 mb-2">Invite from Contacts</label>
-                        <div className="max-h-48 overflow-y-auto space-y-2 p-2 bg-zinc-800/50 rounded-2xl border border-zinc-700/50">
+                        <div className="max-h-48 overflow-y-auto space-y-2 p-3 bg-zinc-800/50 rounded-2xl border border-zinc-700/50">
                             {MOCK_CONTACTS.map(contact => (
                                 <label key={contact.id} className="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-700/50 cursor-pointer">
                                     <div className="flex items-center space-x-3">

@@ -58,7 +58,7 @@ const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClose, onCr
                 <div className="w-10 h-1.5 bg-zinc-700 rounded-full mx-auto mb-4"></div>
                 <h2 className="text-2xl font-bold text-white mb-4 text-center">Create Poll</h2>
                 
-                <form onSubmit={handleSubmit} className="p-2">
+                <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label htmlFor="poll-question" className="block text-sm font-semibold text-zinc-400 mb-2">Question</label>
                         <input

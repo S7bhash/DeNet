@@ -53,68 +53,46 @@ This is a static web project with no server-side build step. To run it, you can:
 
 ---
 
-## Building for iOS & Android (Production)
+## Building for iOS & Android with Capacitor
 
-To run this web application on a mobile simulator, we will use **Capacitor** to wrap it in a native project.
+To run this web application on a mobile device or simulator, we will use **Capacitor** to wrap it in a native project.
 
-### Prerequisites for Mobile Builds
+### 1. Prerequisites
 
-1.  **Node.js and npm:** [Install Node.js](https://nodejs.org/)
-2.  **iOS Development:**
-    - A macOS computer
-    - [Xcode](https://developer.apple.com/xcode/)
-    - [CocoaPods](https://cocoapods.org/): `sudo gem install cocoapods`
-3.  **Android Development:**
-    - [Java JDK](https://www.oracle.com/java/technologies/downloads/)
-    - [Android Studio](https://developer.android.com/studio)
+First, ensure you have the required development environments set up.
 
-### Recommended Method: Using the Setup Script
+-   **All Platforms:**
+    -   [Node.js and npm](https://nodejs.org/): Required for installing Capacitor.
+-   **iOS Development:**
+    -   A macOS computer
+    -   [Xcode](https://developer.apple.com/xcode/): Apple's IDE for iOS development.
+    -   [CocoaPods](https://cocoapods.org/): A dependency manager for Swift and Objective-C projects. Install with `sudo gem install cocoapods`.
+-   **Android Development:**
+    -   [Java JDK](https://www.oracle.com/java/technologies/downloads/) (Version 11 or higher).
+    -   [Android Studio](https://developer.android.com/studio): The IDE for Android development.
 
-The easiest way to get started is by using the provided setup script. It automates all the necessary steps.
+### 2. Project Setup
 
-1.  **Make the script executable:**
-    ```bash
-    chmod +x setup.sh
-    ```
-2.  **Run the script:**
-    ```bash
-    ./setup.sh
-    ```
-3.  The script will guide you through the process. Once it's finished, you can open the native project directly.
+Follow these steps in your terminal, at the root of the project directory.
 
-    -   **For iOS:** `npx cap open ios`
-    -   **For Android:** `npx cap open android`
-
-### Manual Step-by-Step Instructions
-
-If you prefer to set up the project manually, follow these steps.
-
-#### 1. Project Setup
-
-First, open your terminal in the project's root directory and install the Capacitor CLI and core packages.
+#### Step A: Install Capacitor
+Install the Capacitor CLI (Command Line Interface) and the core native platform packages.
 
 ```bash
-npm install @capacitor/cli @capacitor/core
-npm install @capacitor/ios @capacitor/android
+npm install @capacitor/cli @capacitor/core @capacitor/ios @capacitor/android
 ```
 
-#### 2. Initialize Capacitor
-
-Initialize Capacitor for the project. When prompted, you can use the following details:
-- **App Name:** Decentralized Sync
-- **App ID:** com.example.decentralizedsync
-
+#### Step B: Initialize Capacitor
+This command creates the `capacitor.config.ts` file, which configures your native app. Because the file is now included in the project, you can skip this step, but for future reference, the command would be:
 ```bash
-npx cap init
+npx cap init "Decentralized Sync" "com.example.decentralizedsync.app" --web-dir="www"
 ```
 
-This will create a `capacitor.config.ts` file.
+#### Step C: Prepare Web Assets
+Capacitor needs a dedicated `www` directory containing all your web code.
 
-#### 3. Configure Web Directory
-
-Capacitor needs to know where your web assets are.
-1.  Create a new directory named `www` in the project root.
-2.  **Copy all project files and folders** (except for `node_modules` and `package.json`/`package-lock.json` if you have them) into the `www` directory. Your `www` directory should look like this:
+1.  Create a new directory named `www` at the project root.
+2.  **Copy all web files and folders** into the `www` directory. Your `www` folder's contents should look like this:
     ```
     www/
     ├── App.tsx
@@ -124,26 +102,12 @@ Capacitor needs to know where your web assets are.
     ├── index.tsx
     ├── metadata.json
     ├── services/
-    └── types.ts
+    ├── types.ts
+    └── ... (and any other web assets)
     ```
-3.  Open the generated `capacitor.config.ts` file and make sure the `webDir` is set to `'www'`.
 
-```typescript
-// capacitor.config.ts
-import type { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
-  appId: 'com.example.decentralizedsync',
-  appName: 'Decentralized Sync',
-  webDir: 'www' // This is the important line
-};
-
-export default config;
-```
-
-#### 4. Add Mobile Platforms
-
-Now, add the native iOS and Android projects.
+#### Step D: Add Native Platforms
+This command creates the native `ios` and `android` project folders.
 
 ```bash
 # For iOS
@@ -153,31 +117,42 @@ npx cap add ios
 npx cap add android
 ```
 
-#### 5. Sync Web Assets
+### 3. Running on a Simulator
 
-Sync your web assets from the `www` directory into the native projects.
+After the initial setup, you can run the app.
 
-```bash
-npx cap sync
-```
+#### For iOS
 
-#### 6. Run on iOS Simulator
+1.  **Sync Web Assets:** This crucial command copies your web code from the `www` folder into the native iOS project and installs any required native dependencies (pods).
+    ```bash
+    npx cap sync ios
+    ```
+    > **Troubleshooting:** If you encounter build errors in Xcode related to missing pods, try running `npx pod-install` in the root directory, or `pod install` manually inside the `ios/App` directory and try again.
 
-1.  Open the native iOS project in Xcode.
+2.  **Open in Xcode:**
     ```bash
     npx cap open ios
     ```
-2.  Once Xcode opens, select your desired iPhone simulator from the top bar.
-3.  Click the "Run" button (▶) to build and launch the app on the simulator.
 
-#### 7. Run on Android Emulator
+3.  **Run the App:**
+    -   Once Xcode opens, wait for it to finish indexing.
+    -   Select your desired iPhone simulator from the list at the top of the window.
+    -   Click the "Run" button (▶) to build and launch the app on the simulator.
 
-1.  Open Android Studio.
-2.  Go to `Tools > AVD Manager` and create an Android Virtual Device (Emulator) if you don't have one.
-3.  Open the native Android project in Android Studio.
+#### For Android
+
+1.  **Sync Web Assets:** This copies your web code into the native Android project.
+    ```bash
+    npx cap sync android
+    ```
+
+2.  **Open in Android Studio:**
     ```bash
     npx cap open android
     ```
-4.  Android Studio will take a moment to sync Gradle.
-5.  Once ready, select your emulator from the device dropdown.
-6.  Click the "Run" button (▶) to build and launch the app on the emulator.
+
+3.  **Run the App:**
+    -   Wait for Android Studio to sync the project with Gradle.
+    -   If you don't have an emulator, create one via `Tools > AVD Manager`.
+    -   Select your emulator from the device dropdown.
+    -   Click the "Run" button (▶) to build and launch the app.

@@ -209,8 +209,8 @@ const Message: React.FC<MessageProps> = ({ message, author, currentUser, onToggl
   };
 
   return (
-    <div className={`flex items-start gap-3 group ${isCurrentUser ? 'flex-row-reverse' : ''} ${animationClass}`}>
-      <img src={author.avatarUrl} alt={author.name} className="w-10 h-10 rounded-full mt-1 shadow-md" />
+    <div className={`flex items-start gap-2 sm:gap-3 group ${isCurrentUser ? 'flex-row-reverse' : ''} ${animationClass}`}>
+      <img src={author.avatarUrl} alt={author.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mt-1 shadow-md" />
       <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}`}>
         <div className="flex items-center space-x-2">
           {!isCurrentUser && <span className="font-bold text-sm text-white">{author.name}</span>}

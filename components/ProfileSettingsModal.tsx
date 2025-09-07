@@ -69,7 +69,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                 <div className="w-10 h-1.5 bg-zinc-700 rounded-full mx-auto mb-4"></div>
                 <h2 className="text-2xl font-bold text-white mb-6 text-center">Profile Settings</h2>
                 
-                <form onSubmit={handleSave} className="p-2">
+                <form onSubmit={handleSave}>
                     <div className="flex items-center space-x-4 mb-6">
                         <div className="relative">
                             <img src={avatarUrl} alt="Current avatar" className="w-20 h-20 rounded-full border-2 border-zinc-600" />

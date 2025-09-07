@@ -48,7 +48,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onClose, on
                 <div className="w-10 h-1.5 bg-zinc-700 rounded-full mx-auto mb-4"></div>
                 <h2 className="text-2xl font-bold text-white mb-4 text-center">Create Event</h2>
                 
-                <form onSubmit={handleSubmit} className="p-2 space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label htmlFor="event-title" className="block text-sm font-semibold text-zinc-400 mb-2">Event Title</label>
                         <input
