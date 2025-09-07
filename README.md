@@ -71,9 +71,9 @@ First, ensure you have the required development environments set up.
     -   [Java JDK](https://www.oracle.com/java/technologies/downloads/) (Version 11 or higher).
     -   [Android Studio](https://developer.android.com/studio): The IDE for Android development.
 
-### 2. Project Setup
+### 2. Initial Project Setup
 
-Follow these steps in your terminal, at the root of the project directory.
+If this is your first time building for mobile, follow these steps in your terminal at the project root.
 
 #### Step A: Install Capacitor
 Install the Capacitor CLI (Command Line Interface) and the core native platform packages.
@@ -82,31 +82,7 @@ Install the Capacitor CLI (Command Line Interface) and the core native platform 
 npm install @capacitor/cli @capacitor/core @capacitor/ios @capacitor/android
 ```
 
-#### Step B: Initialize Capacitor
-This command creates the `capacitor.config.ts` file, which configures your native app. Because the file is now included in the project, you can skip this step, but for future reference, the command would be:
-```bash
-npx cap init "Decentralized Sync" "com.example.decentralizedsync.app" --web-dir="www"
-```
-
-#### Step C: Prepare Web Assets
-Capacitor needs a dedicated `www` directory containing all your web code.
-
-1.  Create a new directory named `www` at the project root.
-2.  **Copy all web files and folders** into the `www` directory. Your `www` folder's contents should look like this:
-    ```
-    www/
-    ├── App.tsx
-    ├── components/
-    ├── constants.ts
-    ├── index.html
-    ├── index.tsx
-    ├── metadata.json
-    ├── services/
-    ├── types.ts
-    └── ... (and any other web assets)
-    ```
-
-#### Step D: Add Native Platforms
+#### Step B: Add Native Platforms
 This command creates the native `ios` and `android` project folders.
 
 ```bash
@@ -117,31 +93,26 @@ npx cap add ios
 npx cap add android
 ```
 
-### 3. Running on a Simulator
+### 3. Running on a Simulator (Recommended Workflow)
 
-After the initial setup, you can run the app.
+To avoid common errors with manual file copying, use the provided helper script.
 
 #### For iOS
 
-1.  **Sync Web Assets:** This crucial command copies your web code from the `www` folder into the native iOS project and installs any required native dependencies (pods).
+1.  **Make the script executable** (you only need to do this once):
     ```bash
-    npx cap sync ios
-    ```
-    > **Troubleshooting:** If you encounter build errors in Xcode related to missing pods, try running `npx pod-install` in the root directory, or `pod install` manually inside the `ios/App` directory and try again.
-
-2.  **Open in Xcode:**
-    ```bash
-    npx cap open ios
+    chmod +x run-in-iphone.sh
     ```
 
-3.  **Run the App:**
-    -   Once Xcode opens, wait for it to finish indexing.
-    -   Select your desired iPhone simulator from the list at the top of the window.
-    -   Click the "Run" button (▶) to build and launch the app on the simulator.
+2.  **Run the script:**
+    ```bash
+    ./run-in-iphone.sh
+    ```
+    This script automatically handles cleaning, copying web assets, syncing with the native project, and launching the app on the **iPhone 15 Pro simulator**.
 
 #### For Android
 
-1.  **Sync Web Assets:** This copies your web code into the native Android project.
+1.  **Sync Web Assets:** This command copies your web files to the `www` folder (creating it if needed) and updates the native Android project.
     ```bash
     npx cap sync android
     ```
@@ -153,6 +124,15 @@ After the initial setup, you can run the app.
 
 3.  **Run the App:**
     -   Wait for Android Studio to sync the project with Gradle.
-    -   If you don't have an emulator, create one via `Tools > AVD Manager`.
     -   Select your emulator from the device dropdown.
     -   Click the "Run" button (▶) to build and launch the app.
+
+---
+### Manual Build Steps (If not using the script)
+
+If you prefer to run the steps manually:
+
+1.  **Prepare Web Assets**: Create a `www` directory at the project root and copy **all** web files and folders into it (`App.tsx`, `components/`, `index.html`, etc.).
+2.  **Sync Web Assets**: Run `npx cap sync ios` or `npx cap sync android`.
+3.  **Open in IDE**: Run `npx cap open ios` or `npx cap open android`.
+4.  **Run**: Build and run from within Xcode or Android Studio.
