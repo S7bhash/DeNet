@@ -74,17 +74,18 @@ const EventContent = memo<{ message: Message }>(({ message }) => {
 const LocationContent = memo<{ message: Message }>(({ message }) => {
     if (!message.location) return null;
     const { label, latitude, longitude } = message.location;
-    // In a real app, use a map library. Here, we use a static image placeholder.
+    // Use a static image for the preview, but link to a real map service.
     const mapImageUrl = `https://picsum.photos/seed/map${latitude},${longitude}/400/200`;
+    const mapLinkUrl = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=15/${latitude}/${longitude}`;
     
     return (
-        <div>
+        <a href={mapLinkUrl} target="_blank" rel="noopener noreferrer" className="block cursor-pointer">
             <img src={mapImageUrl} alt={`Map of ${label}`} className="rounded-t-2xl" />
             <div className="p-2 bg-zinc-700/50 rounded-b-2xl">
                 <p className="font-bold text-white">{label}</p>
                 <p className="text-xs text-zinc-400">{latitude.toFixed(4)}, {longitude.toFixed(4)}</p>
             </div>
-        </div>
+        </a>
     );
 });
 
@@ -217,7 +218,7 @@ const Message: React.FC<MessageProps> = ({ message, author, currentUser, onToggl
           {isCurrentUser && <ReadReceipt message={message} isCurrentUser={isCurrentUser} />}
         </div>
 
-        <div className={`p-3 rounded-2xl max-w-md shadow-lg ${isCurrentUser ? 'bg-lime-900/80 rounded-br-xl' : 'bg-zinc-800/80 rounded-bl-xl'}`}>
+        <div className={`p-3 rounded-2xl max-w-[85%] md:max-w-md shadow-lg ${isCurrentUser ? 'bg-lime-900/80 rounded-br-xl' : 'bg-zinc-800/80 rounded-bl-xl'}`}>
           <MessageContent message={message} currentUser={currentUser} onVoteOnPoll={onVoteOnPoll} />
         </div>
         

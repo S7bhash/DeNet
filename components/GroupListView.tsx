@@ -16,7 +16,7 @@ interface GroupListViewProps {
 }
 
 const UserProfileHeader: React.FC<{ currentUser: User, isConnected: boolean; onOpenProfileModal: () => void; onToggleConnection: () => void; }> = React.memo(({ currentUser, isConnected, onOpenProfileModal, onToggleConnection }) => (
-    <div className="flex items-center justify-between p-4 bg-black/30 backdrop-blur-sm">
+    <div className="flex items-center justify-between px-4 pb-4 pt-[calc(env(safe-area-inset-top,0rem)+1rem)] bg-black/30 backdrop-blur-sm">
         <div className="flex items-center space-x-3">
             <div className="relative">
                 <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-12 h-12 rounded-full border-2 border-zinc-600"/>
@@ -141,7 +141,7 @@ const GroupListView: React.FC<GroupListViewProps> = ({ currentUser, groups, onSe
 
             <button 
                 onClick={onOpenCreateGroupModal}
-                className="absolute bottom-6 right-6 bg-lime-500 text-black rounded-full h-14 w-14 flex items-center justify-center shadow-lg hover:bg-lime-400 transition-transform duration-200 hover:scale-105"
+                className="absolute bottom-[calc(env(safe-area-inset-bottom,0rem)+1.5rem)] right-[calc(env(safe-area-inset-right,0rem)+1.5rem)] bg-lime-500 text-black rounded-full h-14 w-14 flex items-center justify-center shadow-lg hover:bg-lime-400 transition-transform duration-200 hover:scale-105"
                 aria-label="Create new group"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">

@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface HeaderProps {
@@ -30,9 +31,9 @@ const ViewToggleButton: React.FC<{ label: string; isActive: boolean; onClick: ()
 
 const Header: React.FC<HeaderProps> = ({ groupName, memberCount, activeView, onViewChange, onBack }) => {
   return (
-    <header className="flex items-center justify-between p-2.5 border-b border-zinc-800 bg-zinc-900/70 shadow-md backdrop-blur-sm z-10">
+    <header className="flex md:hidden items-center justify-between px-4 pb-3 pt-[calc(env(safe-area-inset-top,0rem)+0.75rem)] border-b border-zinc-800 bg-zinc-900/70 shadow-md backdrop-blur-sm z-10">
       <div className="flex items-center space-x-2">
-        <button onClick={onBack} className="p-2 text-zinc-400 hover:text-white rounded-full transition-colors">
+        <button onClick={onBack} className="w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-white rounded-full transition-colors -ml-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

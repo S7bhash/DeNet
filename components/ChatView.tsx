@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Group, Message as MessageType, MessageType as MsgEnum, User } from '../types';
 import Header from './Header';
@@ -45,7 +46,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   const mediaMessages = group.messages.filter(m => m.type === MsgEnum.IMAGE || m.type === MsgEnum.VIDEO);
 
   return (
-    <div className="relative flex-1 flex flex-col h-full overflow-hidden">
+    <div className="relative flex-1 flex flex-col h-full overflow-hidden bg-zinc-950">
       <GraffitiBackground />
       
       <div className="relative z-10 flex flex-col h-full bg-transparent">
@@ -85,7 +86,7 @@ const ChatView: React.FC<ChatViewProps> = ({
             <div className="px-6 pb-2 text-sm text-lime-400 flex items-center justify-center animate-pulse bg-zinc-950/50">
                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-lime-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 * 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               Syncing with peer nodes...
             </div>
@@ -97,7 +98,7 @@ const ChatView: React.FC<ChatViewProps> = ({
            </div>
         )}
 
-        <div className="p-2 border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
+        <div className="px-4 pt-2 pb-[calc(env(safe-area-inset-bottom,0rem)+0.5rem)] border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
           <MessageInput 
             onSendMessage={onSendMessage} 
             disabled={!isConnected || isSyncing}

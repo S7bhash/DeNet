@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import GroupListView from './components/GroupListView';
 import ChatView from './components/ChatView';
@@ -142,182 +143,158 @@ const App: React.FC = () => {
     if (!isConnected) return;
     p2pNetwork.deleteMessage(groupId, messageId);
 
-    // Optimistic UI update
+    // Optimistically update UI
     setGroups(prevGroups => prevGroups.map(group => 
-        group.id === groupId
-            ? { ...group, messages: group.messages.filter(m => m.id !== messageId) }
-            : group
+      group.id === groupId 
+        ? { ...group, messages: group.messages.filter(m => m.id !== messageId) } 
+        : group
     ));
   }, [isConnected, p2pNetwork]);
   
   const handleToggleReaction = useCallback((groupId: string, messageId: string, emoji: string) => {
     if (!isConnected) return;
-
     p2pNetwork.toggleReaction(groupId, messageId, currentUser.id, emoji);
-    setGroups(p2pNetwork.getGroupsState()); // Sync state after interaction
+    // Optimistic update
+    const networkState = p2pNetwork.getGroupsState();
+    setGroups(networkState);
   }, [isConnected, currentUser.id, p2pNetwork]);
-
+  
   const handleVoteOnPoll = useCallback((groupId: string, messageId: string, optionIndex: number) => {
     if (!isConnected) return;
     p2pNetwork.voteOnPoll(groupId, messageId, optionIndex, currentUser.id);
-    setGroups(p2pNetwork.getGroupsState()); // Sync state after interaction
+    const networkState = p2pNetwork.getGroupsState();
+    setGroups(networkState);
   }, [isConnected, currentUser.id, p2pNetwork]);
 
-  const handleCreateGroup = useCallback((groupName: string, invitedContacts: Contact[]) => {
-    if (!groupName.trim() || invitedContacts.length === 0) return;
-    
-    const timestamp = new Date().toISOString();
-    
-    const initialMessages: Message[] = [
-        {
-          id: `msg-create-${Date.now()}`,
-          authorId: 'system',
-          type: MessageType.SYSTEM,
-          content: `You created the network "${groupName}".`,
-          timestamp,
-          reactions: {},
-          readBy: [currentUser.id]
-        },
-        ...invitedContacts.map((contact, index): Message => {
-            if (!contact.isUser) {
-                 showNotification('New Network Invitation', {
-                    body: `${currentUser.name} has invited you to join the network "${groupName}".`,
-                    icon: currentUser.avatarUrl,
-                });
-            }
-            return {
-             id: `msg-invite-${Date.now()}-${index}`,
-             authorId: 'system',
-             type: MessageType.SYSTEM,
-             content: `You invited ${contact.name}. A notification will be sent.`,
-             timestamp,
-             reactions: {},
-             readBy: [currentUser.id]
-            }
-        })
+  const handleCreateGroup = (groupName: string, selectedContacts: Contact[]) => {
+    const newMembers = [currentUser, ...selectedContacts
+      .map(c => Object.values(initialUser).find(u => u.name === c.name))
+      .filter((u): u is User => u !== undefined)
     ];
 
-    const newGroup = p2pNetwork.createGroup(groupName, [currentUser], initialMessages);
+    const welcomeMessage: Message = {
+      id: `msg-sys-${Date.now()}`,
+      authorId: 'system',
+      type: MessageType.SYSTEM,
+      content: `${currentUser.name} created the group "${groupName}".`,
+      timestamp: new Date().toISOString(),
+      reactions: {},
+      readBy: newMembers.map(m => m.id)
+    };
 
-    setGroups(prevGroups => [...prevGroups, newGroup]);
-    setActiveGroupId(newGroup.id);
+    const newGroup = p2pNetwork.createGroup(groupName, newMembers, [welcomeMessage]);
+    
+    setGroups(prev => [...prev, newGroup]);
     setCreateGroupModalOpen(false);
-  }, [p2pNetwork, currentUser]);
-
-  const handleAcceptInvitation = useCallback((invitation: Invitation) => {
-    const { group } = invitation;
-    const groupWithCurrentUser = {
-      ...group,
-      members: [...group.members, currentUser],
-      messages: [
-        ...group.messages,
-        {
-          id: `msg-join-${Date.now()}`,
-          authorId: 'system',
-          type: MessageType.SYSTEM,
-          content: `${currentUser.name} joined the network.`,
-          timestamp: new Date().toISOString(),
-          reactions: {},
-          readBy: [...group.members.map(m => m.id), currentUser.id],
-        }
-      ]
-    };
-    p2pNetwork.addGroup(groupWithCurrentUser);
-    setGroups(prev => [...prev, groupWithCurrentUser]);
-    setInvitations(prev => prev.filter(inv => inv.id !== invitation.id));
-    setActiveGroupId(group.id);
-  }, [p2pNetwork, currentUser]);
-
-  const handleDeclineInvitation = useCallback((invitationId: string) => {
-    setInvitations(prev => prev.filter(inv => inv.id !== invitationId));
-  }, []);
+    setActiveGroupId(newGroup.id);
+  };
   
-  const handleUpdateProfile = useCallback((name: string, avatarUrl: string) => {
-    setCurrentUser(prev => ({ ...prev, name, avatarUrl }));
+  const handleUpdateProfile = (name: string, avatarUrl: string) => {
+    setCurrentUser(prev => ({...prev, name, avatarUrl}));
     setProfileModalOpen(false);
-  }, []);
+  };
 
-  const handleCreatePoll = useCallback((question: string, options: string[]) => {
-    if (!activeGroupId) return;
-    const pollData = {
-        question,
-        options: options.map(opt => ({ text: opt, votes: [] }))
-    };
-    handleSendMessage(MessageType.POLL, `Poll: ${question}`, undefined, { poll: pollData });
-    setCreatePollModalOpen(false);
-  }, [activeGroupId, handleSendMessage]);
-
-  const handleCreateEvent = useCallback((title: string, dateTime: string, location: string) => {
-    if (!activeGroupId) return;
-    const eventData = { title, dateTime, location };
-    handleSendMessage(MessageType.EVENT, `Event: ${title}`, undefined, { event: eventData });
-    setCreateEventModalOpen(false);
-  }, [activeGroupId, handleSendMessage]);
-
+  const handleCreatePoll = (question: string, options: string[]) => {
+      const pollPayload = {
+        poll: {
+            question,
+            options: options.map(opt => ({ text: opt, votes: [] }))
+        }
+      };
+      handleSendMessage(MessageType.POLL, `Poll: ${question}`, undefined, pollPayload);
+      setCreatePollModalOpen(false);
+  };
+  
+  const handleCreateEvent = (title: string, dateTime: string, location: string) => {
+      const eventPayload = {
+          event: { title, dateTime, location }
+      };
+      handleSendMessage(MessageType.EVENT, `Event: ${title}`, undefined, eventPayload);
+      setCreateEventModalOpen(false);
+  };
+  
+  const handleAcceptInvitation = (invitation: Invitation) => {
+      const newGroup: Group = {
+          ...invitation.group,
+          members: [...invitation.group.members, currentUser]
+      };
+      p2pNetwork.addGroup(newGroup);
+      setGroups(prev => [...prev, newGroup]);
+      setInvitations(prev => prev.filter(i => i.id !== invitation.id));
+      setActiveGroupId(newGroup.id);
+  };
+  
+  const handleDeclineInvitation = (invitationId: string) => {
+      setInvitations(prev => prev.filter(i => i.id !== invitationId));
+  };
+  
   return (
-    <>
-      <div className="h-screen w-screen text-zinc-300 bg-zinc-950 font-mono overflow-hidden">
-        <div className="relative h-full w-full">
-            <div className={`absolute top-0 left-0 w-full h-full transition-transform duration-300 ease-out ${activeGroupId ? '-translate-x-full' : 'translate-x-0'}`}>
-                <GroupListView 
+    <div className="w-full h-full bg-zinc-950 text-zinc-200 flex justify-center">
+      <div className="w-full h-full flex overflow-hidden relative md:max-w-screen-lg lg:max-w-screen-xl md:border-x md:border-zinc-800">
+        <div className={`w-full h-full absolute md:static md:w-[350px] lg:w-[400px] md:flex-shrink-0 inset-0 transition-transform duration-300 ease-in-out z-20 ${activeGroupId ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}`}>
+           <GroupListView 
+              currentUser={currentUser}
+              groups={groups}
+              onSelectGroup={handleSelectGroup}
+              isConnected={isConnected}
+              onToggleConnection={() => handleSetConnection(!isConnected)}
+              onOpenCreateGroupModal={() => setCreateGroupModalOpen(true)}
+              onOpenProfileModal={() => setProfileModalOpen(true)}
+              invitations={invitations}
+              onAcceptInvitation={handleAcceptInvitation}
+              onDeclineInvitation={handleDeclineInvitation}
+           />
+        </div>
+        <main className={`flex-1 transition-transform duration-300 ease-in-out md:translate-x-0 absolute inset-0 md:static z-10 ${activeGroupId ? 'translate-x-0' : 'translate-x-full'}`} onTransitionEnd={handleTransitionEnd}>
+            {renderedGroup ? (
+                <ChatView 
+                  group={renderedGroup} 
                   currentUser={currentUser}
-                  groups={groups} 
-                  onSelectGroup={handleSelectGroup}
+                  isSyncing={isSyncing}
                   isConnected={isConnected}
-                  onToggleConnection={() => handleSetConnection(!isConnected)}
-                  onOpenCreateGroupModal={() => setCreateGroupModalOpen(true)}
-                  onOpenProfileModal={() => setProfileModalOpen(true)}
-                  invitations={invitations}
-                  onAcceptInvitation={handleAcceptInvitation}
-                  onDeclineInvitation={handleDeclineInvitation}
+                  onSendMessage={handleSendMessage}
+                  onToggleReaction={handleToggleReaction}
+                  onDeleteMessage={handleDeleteMessage}
+                  onVoteOnPoll={handleVoteOnPoll}
+                  justSentMessageIds={justSentMessageIds}
+                  onBack={handleBackToGroups}
+                  onOpenPollModal={() => setCreatePollModalOpen(true)}
+                  onOpenEventModal={() => setCreateEventModalOpen(true)}
                 />
-            </div>
-
-            {renderedGroup && (
-                <div 
-                    className={`absolute top-0 left-0 w-full h-full transition-transform duration-300 ease-out ${activeGroupId ? 'translate-x-0' : 'translate-x-full'}`}
-                    onTransitionEnd={handleTransitionEnd}
-                >
-                    <ChatView 
-                      group={renderedGroup} 
-                      currentUser={currentUser}
-                      isSyncing={isSyncing}
-                      isConnected={isConnected}
-                      onSendMessage={handleSendMessage}
-                      onToggleReaction={handleToggleReaction}
-                      onDeleteMessage={handleDeleteMessage}
-                      onVoteOnPoll={handleVoteOnPoll}
-                      justSentMessageIds={justSentMessageIds}
-                      onBack={handleBackToGroups}
-                      onOpenPollModal={() => setCreatePollModalOpen(true)}
-                      onOpenEventModal={() => setCreateEventModalOpen(true)}
-                    />
+            ) : (
+               <div className="hidden md:flex flex-col items-center justify-center h-full text-zinc-500 bg-zinc-950">
+                    <svg className="w-24 h-24 text-zinc-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <p className="mt-4 text-lg font-semibold">Select a conversation</p>
+                    <p className="text-sm text-zinc-600">Choose from your existing groups to read and send messages.</p>
                 </div>
             )}
-        </div>
+        </main>
       </div>
-      <CreateGroupModal
-        isOpen={isCreateGroupModalOpen}
-        onClose={() => setCreateGroupModalOpen(false)}
-        onCreate={handleCreateGroup}
-      />
-      <ProfileSettingsModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setProfileModalOpen(false)}
-        onSave={handleUpdateProfile}
-        currentUser={currentUser}
-      />
-      <CreatePollModal
-        isOpen={isCreatePollModalOpen}
-        onClose={() => setCreatePollModalOpen(false)}
-        onCreate={handleCreatePoll}
-      />
-      <CreateEventModal
-        isOpen={isCreateEventModalOpen}
-        onClose={() => setCreateEventModalOpen(false)}
-        onCreate={handleCreateEvent}
-      />
-    </>
+        
+        <CreateGroupModal 
+          isOpen={isCreateGroupModalOpen}
+          onClose={() => setCreateGroupModalOpen(false)}
+          onCreate={handleCreateGroup}
+        />
+        <ProfileSettingsModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          onSave={handleUpdateProfile}
+          currentUser={currentUser}
+        />
+        <CreatePollModal 
+          isOpen={isCreatePollModalOpen}
+          onClose={() => setCreatePollModalOpen(false)}
+          onCreate={handleCreatePoll}
+        />
+        <CreateEventModal
+          isOpen={isCreateEventModalOpen}
+          onClose={() => setCreateEventModalOpen(false)}
+          onCreate={handleCreateEvent}
+        />
+    </div>
   );
 };
 

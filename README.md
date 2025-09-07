@@ -68,7 +68,26 @@ To run this web application on a mobile simulator, we will use **Capacitor** to 
     - [Java JDK](https://www.oracle.com/java/technologies/downloads/)
     - [Android Studio](https://developer.android.com/studio)
 
-### Step-by-Step Instructions
+### Recommended Method: Using the Setup Script
+
+The easiest way to get started is by using the provided setup script. It automates all the necessary steps.
+
+1.  **Make the script executable:**
+    ```bash
+    chmod +x setup.sh
+    ```
+2.  **Run the script:**
+    ```bash
+    ./setup.sh
+    ```
+3.  The script will guide you through the process. Once it's finished, you can open the native project directly.
+
+    -   **For iOS:** `npx cap open ios`
+    -   **For Android:** `npx cap open android`
+
+### Manual Step-by-Step Instructions
+
+If you prefer to set up the project manually, follow these steps.
 
 #### 1. Project Setup
 

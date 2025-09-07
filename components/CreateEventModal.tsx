@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 
 interface CreateEventModalProps {
@@ -37,11 +38,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onClose, on
 
     return (
         <div 
-            className={`fixed inset-0 z-50 transition-colors duration-300 ${isOpen ? 'bg-black/80' : 'bg-transparent pointer-events-none'}`}
+            className={`fixed inset-0 z-50 flex items-end md:items-center md:justify-center transition-all duration-300 ${isOpen ? 'bg-black/80' : 'bg-transparent pointer-events-none'}`}
             onClick={onClose}
         >
             <div 
-                className={`fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 rounded-t-2xl shadow-2xl p-4 text-zinc-200 transition-transform duration-300 ease-out ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}
+                className={`w-full bg-zinc-900 border-t border-zinc-800 rounded-t-2xl shadow-2xl px-4 pt-4 pb-[calc(env(safe-area-inset-bottom,0rem)+1rem)] text-zinc-200 transform transition-all duration-300 ease-out md:max-w-lg md:rounded-2xl md:border md:p-6 ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full md:translate-y-0 md:scale-95 opacity-0'}`}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="w-10 h-1.5 bg-zinc-700 rounded-full mx-auto mb-4"></div>

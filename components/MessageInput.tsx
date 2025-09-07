@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { MessageType } from '../types';
 
 interface MessageInputProps {
@@ -47,34 +47,66 @@ const AttachmentOptions: React.FC<{ onSelect: (type: MessageType) => void, disab
 const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled, onOpenPollModal, onOpenEventModal }) => {
   const [inputValue, setInputValue] = useState('');
   const [areOptionsOpen, setAreOptionsOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileTrigger = (type: 'IMAGE' | 'VIDEO' | 'FILE' | 'CAMERA') => {
+    if (fileInputRef.current) {
+        if (type === 'IMAGE') {
+            fileInputRef.current.accept = 'image/*';
+            fileInputRef.current.removeAttribute('capture');
+        } else if (type === 'VIDEO') {
+            fileInputRef.current.accept = 'video/*';
+            fileInputRef.current.removeAttribute('capture');
+        } else if (type === 'CAMERA') {
+            fileInputRef.current.accept = 'image/*';
+            fileInputRef.current.setAttribute('capture', 'environment');
+        } else { // FILE
+            fileInputRef.current.accept = '*/*';
+            fileInputRef.current.removeAttribute('capture');
+        }
+        fileInputRef.current.click();
+    }
+  };
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const sizeInMB = file.size / (1024 * 1024);
+    const fileSize = sizeInMB < 0.1 
+        ? `${(file.size / 1024).toFixed(1)} KB`
+        : `${sizeInMB.toFixed(1)} MB`;
+    const fileInfo = { fileName: file.name, fileSize };
+
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const base64Content = e.target?.result as string;
+            onSendMessage(MessageType.IMAGE, base64Content, fileInfo);
+        };
+        reader.readAsDataURL(file);
+    } else if (file.type.startsWith('video/')) {
+        const content = `https://picsum.photos/seed/vid${Date.now()}/400/225`;
+        onSendMessage(MessageType.VIDEO, content, fileInfo);
+    } else {
+        onSendMessage(MessageType.FILE, '', fileInfo);
+    }
+
+    if (event.target) {
+        event.target.value = '';
+    }
+  };
+
 
   const handleOptionSelect = (type: MessageType) => {
     setAreOptionsOpen(false);
-    let content = '';
-    let fileInfo = { fileName: '', fileSize: '' };
-    let finalType = type;
-
+    
     switch(type) {
         case MessageType.IMAGE:
-            content = `https://picsum.photos/seed/img${Date.now()}/400/300`;
-            fileInfo = { fileName: 'new-image.jpg', fileSize: '1.1 MB' };
-            onSendMessage(finalType, content, fileInfo);
-            break;
         case MessageType.VIDEO:
-            content = `https://picsum.photos/seed/vid${Date.now()}/400/225`;
-            fileInfo = { fileName: 'clip.mp4', fileSize: '12.3 MB' };
-            onSendMessage(finalType, content, fileInfo);
-            break;
         case MessageType.FILE:
-            content = '';
-            fileInfo = { fileName: 'report.pdf', fileSize: '780 KB' };
-            onSendMessage(finalType, content, fileInfo);
-            break;
         case 'CAMERA' as MessageType:
-            finalType = MessageType.IMAGE;
-            content = `https://picsum.photos/seed/cam${Date.now()}/400/300`;
-            fileInfo = { fileName: 'photo_from_cam.jpg', fileSize: '2.4 MB' };
-            onSendMessage(finalType, content, fileInfo);
+            handleFileTrigger(type as any);
             break;
         case MessageType.POLL:
             onOpenPollModal();
@@ -83,8 +115,21 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled, on
             onOpenEventModal();
             break;
         case MessageType.LOCATION:
-            const locationData = { latitude: 34.0522, longitude: -118.2437, label: "Downtown Los Angeles" };
-            onSendMessage(MessageType.LOCATION, 'Shared a location', undefined, { location: locationData });
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const locationData = { latitude, longitude, label: "Current Location" };
+                    onSendMessage(MessageType.LOCATION, 'Shared a location', undefined, { location: locationData });
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    alert(`Could not get location: ${error.message}`);
+                }
+            );
             break;
         default: return;
     }
@@ -129,6 +174,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled, on
             <SendIcon />
         </button>
         </form>
+        <input
+            type="file"
+            ref={fileInputRef}
+            onChange={onFileChange}
+            className="hidden"
+            aria-hidden="true"
+        />
     </div>
   );
 };
